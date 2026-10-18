@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.12.0/.schema/devbox.schema.json",
+  "packages": [
+    "nodejs_22",
+    "tmux",
+    "act"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo 'OpenRig devbox — devbox run install | build | test | lint'"
+    ],
+    "scripts": {
+      "install": "npm ci",
+      "build": "npm run build",
+      "test": "npm test",
+      "lint": "npm run lint"
+    }
+  }
+}

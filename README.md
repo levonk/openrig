@@ -139,6 +139,54 @@ Sending a message does not itself create a queue item; the builder records the t
 
 Not setting this up today? Get the next walkthrough and occasional OpenRig updates → https://openrig.dev/follow
 
+## Nix
+
+The project provides optional Nix flake outputs for users who already use Nix. The flake builds from source, on `x86_64-linux`, `aarch64-linux`, `x86_64-darwin`, and `aarch64-darwin`.
+
+```bash
+# Latest source from default branch
+nix run github:mvschwarz/openrig
+
+# Specific release (uses the flake at that git tag)
+nix run github:mvschwarz/openrig/v0.6.11
+
+# Named outputs: #openrig, #latest, #source
+nix run github:mvschwarz/openrig#openrig
+
+# Build / develop
+nix build github:mvschwarz/openrig
+nix develop github:mvschwarz/openrig
+```
+
+The flake exposes `packages.<system>.default`, `apps.<system>.default`, `devShells.<system>.default`, and `overlays.default`.
+
+The package wraps `rig` and `openrig-tui` so `tmux`, `git`, `ssh`, `rsync`, and `lsof` are on `PATH` at runtime. Your own installed copies still win if they exist; agent CLIs (Claude Code, Codex, …) are not bundled — install and sign in to them as usual.
+
+Update through the same Nix workflow you used to install. For profile installs, run `nix profile list` and then `nix profile upgrade <index-or-name>`. For flake inputs, run `nix flake update openrig` in your own flake and rebuild.
+
+### Devbox
+
+For a reproducible development environment, use Devbox:
+
+```bash
+# Install Devbox first (if not already installed)
+curl -fsSL https://get.jetify.dev/devbox | bash
+
+# Enter the environment (Node.js 22, tmux, act)
+devbox shell
+
+# Install dependencies, then build and test
+devbox run install
+devbox run build
+devbox run test
+```
+
+Or install Devbox via Homebrew:
+
+```bash
+brew install jetify-com/devbox/devbox
+```
+
 ## Community
 
 - **Questions:** [Discussions › Q&A](https://github.com/mvschwarz/openrig/discussions/categories/q-a)

@@ -45,3 +45,9 @@ packages/daemon/context-packs/
 
 # Internal build receipts; never commit
 /.evidence/
+
+# Nix build result symlinks
+/result
+/result-*
+# Devbox generated artifacts
+.devbox/

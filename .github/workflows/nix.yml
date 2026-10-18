@@ -1,0 +1,87 @@
+name: Nix flake
+
+# Validates the flake (flake.nix) on each PR that can change the Nix build.
+# package-lock.json is in the path filter because the npm dependency fetch is
+# a fixed-output derivation keyed on the lockfile — a lockfile change without
+# a flake change would otherwise never exercise this workflow and hash rot
+# would reach users silently.
+
+on:
+  workflow_dispatch: {}
+  pull_request:
+    branches: [main]
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "**/*.nix"
+      - ".github/workflows/nix.yml"
+      - "package-lock.json"
+      - "package.json"
+      - "packages/*/package.json"
+      - "scripts/generate-context-packs.mjs"
+  push:
+    branches: [main]
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "**/*.nix"
+      - ".github/workflows/nix.yml"
+      - "package-lock.json"
+      - "package.json"
+      - "packages/*/package.json"
+      - "scripts/generate-context-packs.mjs"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nix-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: nix build (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      # Newest GA labels per platform: ubuntu-latest (x86_64-linux),
+      # ubuntu-24.04-arm (aarch64-linux), macos-26 (aarch64-darwin),
+      # macos-26-intel (x86_64-darwin). Covers every system the flake exposes.
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm, macos-26, macos-26-intel]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: nix flake check --all-systems (eval only)
+        # --no-build: evaluate every system's outputs without realising them
+        # (darwin stdenv can't run on linux runners). The build/run steps
+        # below handle realisation for each runner's own system.
+        run: nix flake check --all-systems --no-build
+
+      - name: nix build .#default
+        run: nix build .#default --print-build-logs
+
+      - name: nix run .#default -- --version
+        # SECURITY: nix run executes the built binary outside the sandbox on
+        # the runner, where PR-controlled code could reach the GITHUB_TOKEN
+        # and OIDC endpoint. Gate on non-PR events; the sandboxed build above
+        # is the PR check. Do not drop this guard while pull_request is a
+        # trigger.
+        if: github.event_name != 'pull_request'
+        run: nix run .#default -- --version
+
+      - name: nix run .#openrig -- --version
+        if: github.event_name != 'pull_request'
+        run: nix run .#openrig -- --version
+
+      - name: nix build .#source
+        # #source is an alias for the same source-build derivation; this is
+        # a cache hit that proves the named output resolves.
+        run: nix build .#source --print-build-logs
