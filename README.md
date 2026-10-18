@@ -16,7 +16,7 @@ It's the open-source system behind my AI civilization experiments.
 
 **Start here:** [the guided first-use path](docs/reference/getting-started.md): install, talk to the kernel operator, then choose a team for your first useful change.
 
-Not setting this up today? Get the next walkthrough and occasional OpenRig updates → https://openrig.dev/follow
+Not setting this up today? Get the next walkthrough and occasional OpenRig updates → <https://openrig.dev/follow>
 
 ## Install and first run
 
@@ -137,7 +137,7 @@ rig queue list --destination dev-build@starter --limit 1000
 
 Sending a message does not itself create a queue item; the builder records the task. Read the final artifact and the review of its exact candidate, then return to the same builder for the next change. [The guided first-use path](docs/reference/getting-started.md) covers readiness, a useful task, a reviewed result, Herdr/cmux terminals and recovery.
 
-Not setting this up today? Get the next walkthrough and occasional OpenRig updates → https://openrig.dev/follow
+Not setting this up today? Get the next walkthrough and occasional OpenRig updates → <https://openrig.dev/follow>
 
 ## Nix
 
@@ -471,7 +471,6 @@ The helper never removes the legacy telemetry or library. Retirement follows
 separate stable runtime, writer, reader, and recovery proof. Daemon, database,
 seat, plugin, and release lifecycle actions remain agent-owned.
 
-
 ## Requirements
 
 - Node.js 22 or 24 (the supported versions in this release). Node 20 is no
@@ -483,6 +482,7 @@ seat, plugin, and release lifecycle actions remain agent-owned.
   working setup is in the [getting-started guide](docs/reference/getting-started.md#wsl2-a-reported-working-setup)
 
 Optional:
+
 - herdr or cmux for terminal workspaces showing the agents together
 - Docker for service-backed rigs and managed apps
 

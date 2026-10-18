@@ -100,7 +100,7 @@
         in
         pkgs.stdenv.mkDerivation {
           pname = "openrig";
-          version = (pkgs.lib.importJSON ./packages/cli/package.json).version;
+          inherit ((pkgs.lib.importJSON ./packages/cli/package.json)) version;
           src = pkgs.lib.cleanSource ./.;
 
           nativeBuildInputs = [
